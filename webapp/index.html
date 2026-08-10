@@ -140,7 +140,18 @@ const NAV = [
     { id:'roadmap', path:'ROADMAP.md', name:'The 24-week roadmap', time:'20 min' },
     { id:'setup', path:'SETUP.md', name:'Toolchain setup', time:'60–90 min' },
   ]},
-  { title:'Phase 0 · Foundations', items:[
+  { title:'★ Interactive lessons (do-it-here)', items:[
+    { id:'ix', external:'interactive.html', name:'Open interactive lessons', time:'start here' },
+    { id:'ix1', external:'interactive.html#linux-permissions', name:'Linux permissions', time:'~20 min' },
+    { id:'ix2', external:'interactive.html#linux-cli', name:'Linux CLI essentials', time:'~15 min' },
+    { id:'ix3', external:'interactive.html#git-basics', name:'Git basics', time:'~15 min' },
+    { id:'ix4', external:'interactive.html#networking-cidr', name:'Networking & CIDR', time:'~15 min' },
+    { id:'ix5', external:'interactive.html#aws-iam-cli', name:'AWS IAM & CLI', time:'~15 min' },
+    { id:'ix6', external:'interactive.html#aws-s3', name:'AWS S3 hands-on', time:'~15 min' },
+    { id:'ix7', external:'interactive.html#aws-vpc', name:'AWS VPC & networking', time:'~15 min' },
+    { id:'ix8', external:'interactive.html#aws-lambda', name:'AWS Lambda & events', time:'~10 min' },
+  ]},
+  { title:'Phase 0 · Foundations (reading + full labs)', items:[
     { id:'p0', path:'labs/00-foundations/README.md', name:'Phase 0 overview', time:'5 min' },
     { id:'p0l1', path:'labs/00-foundations/lab-01-linux-cli.md', name:'Lab 1 · Linux & CLI', time:'~8 h' },
     { id:'p0l2', path:'labs/00-foundations/lab-02-git-and-scripting.md', name:'Lab 2 · Git & scripting', time:'~8 h' },
@@ -293,6 +304,7 @@ function buildCidrWidget(){
 let current=null;
 function openLesson(id){
   const item=FLAT.find(i=>i.id===id); if(!item) return;
+  if(item.external){ window.location.href=item.external; return; }
   current=id;
   const inner=document.getElementById('content-inner');
   const md=window.CURRICULUM[item.path]||'*(content not bundled — run `node webapp/build-content.js`)*';
@@ -335,7 +347,8 @@ function renderSidebar(){
       const el=document.createElement('div');
       el.className='navitem'+(item.locked?' locked':'')+(item.id===current?' active':'')+(progress[item.id]?' done':'');
       el.innerHTML='<span class="tick">'+(progress[item.id]?'✓':'')+'</span><span class="label">'+item.name+'</span>'+(item.time?'<span class="time">'+item.time+'</span>':'');
-      if(!item.locked) el.onclick=()=>{ openLesson(item.id); if(window.innerWidth<=900) closeDrawer(); };
+      if(item.external) el.onclick=()=>{ window.location.href=item.external; };
+      else if(!item.locked) el.onclick=()=>{ openLesson(item.id); if(window.innerWidth<=900) closeDrawer(); };
       sb.appendChild(el);
     });
   });

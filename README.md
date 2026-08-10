@@ -54,6 +54,18 @@ cd webapp && ./start.command
 Or double-click `webapp/start.command`. It opens in your browser with sidebar
 navigation, progress tracking, copy-able commands, and interactive widgets.
 
+### Interactive lessons (learn by doing)
+
+The app includes **interactive, do-it-here lessons** with a mock terminal — you
+type real commands (`bash`, `git`, and `aws`/`awslocal`) into a simulated
+environment that behaves like the real thing, plus quizzes and checkpoints that
+won't let you advance until you've got it. No Docker or AWS account needed.
+
+Open `webapp/interactive.html` (or the "★ Interactive lessons" section in the
+sidebar). Lessons: Linux permissions, Linux CLI, Git, Networking/CIDR, AWS IAM,
+S3, VPC, and Lambda. Each has a "Launch live env" button for the real thing when
+you're ready.
+
 Running it elsewhere — sharing via GitHub Pages, or learning from an **Android
 tablet / iPad** via GitHub Codespaces — is covered in **`RUNNING.md`**. The app is
 responsive, so it works on phones and tablets too.
