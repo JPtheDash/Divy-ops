@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DevOps + AWS Path</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel-2:#1c232d; --border:#2a323d;
+    --text:#e6edf3; --muted:#8b98a5; --dim:#5c6773;
+    --accent:#ff9900; --accent-2:#4f8cff; --accent-soft:rgba(255,153,0,.12);
+    --ok:#3fb950; --warn:#d29922; --danger:#f85149;
+    --mono:'SF Mono',ui-monospace,'JetBrains Mono',Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+  .topbar{height:56px;flex:0 0 auto;display:flex;align-items:center;gap:16px;padding:0 20px;background:var(--panel);border-bottom:1px solid var(--border);z-index:10}
+  .menu-btn{display:none;background:var(--panel-2);border:1px solid var(--border);color:var(--text);font-size:18px;line-height:1;padding:6px 11px;border-radius:8px;cursor:pointer}
+  .scrim{display:none;position:fixed;inset:56px 0 0 0;background:rgba(0,0,0,.5);z-index:40}
+  .scrim.show{display:block}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:.2px}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+  .brand small{color:var(--muted);font-weight:400;font-size:12px}
+  .top-progress{margin-left:auto;display:flex;align-items:center;gap:12px;min-width:280px}
+  .bar{flex:1;height:7px;background:var(--panel-2);border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .4s ease}
+  .top-progress span{font-size:13px;color:var(--muted);min-width:130px;text-align:right}
+  .layout{flex:1;display:flex;min-height:0}
+  .sidebar{width:320px;flex:0 0 auto;background:var(--panel);border-right:1px solid var(--border);overflow-y:auto;padding:14px 10px 40px}
+  .content{flex:1;overflow-y:auto;padding:36px 48px 120px;scroll-behavior:smooth}
+  .content-inner{max-width:820px;margin:0 auto}
+  .sec-title{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--dim);padding:16px 12px 6px}
+  .navitem{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:14px;transition:background .15s,color .15s}
+  .navitem:hover{background:var(--panel-2);color:var(--text)}
+  .navitem.active{background:var(--accent-soft);color:var(--text)}
+  .navitem.active .tick{border-color:var(--accent)}
+  .navitem .tick{width:18px;height:18px;flex:0 0 auto;border:1.5px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--bg)}
+  .navitem.done .tick{background:var(--ok);border-color:var(--ok)}
+  .navitem .label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .navitem .time{font-size:11px;color:var(--dim)}
+  .navitem.locked{opacity:.45;cursor:not-allowed}
+  .lesson-head{border-bottom:1px solid var(--border);padding-bottom:20px;margin-bottom:28px}
+  .crumb{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+  .lesson-head h1{margin:0 0 12px;font-size:30px;line-height:1.2}
+  .badges{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .badge{font-size:12px;padding:4px 10px;border-radius:99px;background:var(--panel-2);color:var(--muted);border:1px solid var(--border)}
+  .badge.time{color:var(--accent)}
+  .complete-btn{margin-left:auto;font-family:var(--sans);font-size:13px;padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);cursor:pointer;transition:.15s;display:flex;gap:8px;align-items:center}
+  .complete-btn:hover{border-color:var(--accent)}
+  .complete-btn.done{background:var(--ok);border-color:var(--ok);color:#04140a;font-weight:600}
+  .md h1{font-size:26px;margin:34px 0 14px}
+  .md h2{font-size:21px;margin:30px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+  .md h3{font-size:17px;margin:24px 0 8px}
+  .md p{margin:12px 0}
+  .md a{color:var(--accent-2);text-decoration:none}
+  .md a:hover{text-decoration:underline}
+  .md ul,.md ol{padding-left:24px;margin:12px 0}
+  .md li{margin:6px 0}
+  .md strong{color:#fff;font-weight:600}
+  .md hr{border:none;border-top:1px solid var(--border);margin:28px 0}
+  .md blockquote{border-left:3px solid var(--accent);background:var(--accent-soft);margin:16px 0;padding:10px 18px;border-radius:0 8px 8px 0}
+  .md code:not(pre code){background:var(--panel-2);border:1px solid var(--border);border-radius:5px;padding:1px 6px;font-family:var(--mono);font-size:13px;color:#ffd9a0}
+  .md table{border-collapse:collapse;width:100%;margin:18px 0;font-size:14px;display:block;overflow-x:auto}
+  .md th,.md td{border:1px solid var(--border);padding:9px 12px;text-align:left}
+  .md th{background:var(--panel-2);font-weight:600}
+  .md tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+  .md input[type=checkbox]{width:16px;height:16px;vertical-align:-2px;margin-right:6px;accent-color:var(--accent)}
+  .codewrap{position:relative;margin:16px 0}
+  .codewrap pre{margin:0;background:#0b0f14;border:1px solid var(--border);border-radius:10px;padding:16px;overflow-x:auto}
+  .codewrap pre code{font-family:var(--mono);font-size:13px;line-height:1.6;background:none;padding:0}
+  .copybtn{position:absolute;top:8px;right:8px;font-family:var(--sans);font-size:11px;padding:5px 10px;border-radius:6px;background:var(--panel-2);border:1px solid var(--border);color:var(--muted);cursor:pointer;opacity:0;transition:.15s}
+  .codewrap:hover .copybtn{opacity:1}
+  .copybtn:hover{color:var(--text);border-color:var(--accent)}
+  .copybtn.copied{color:var(--ok);border-color:var(--ok)}
+  .lang-tag{position:absolute;top:8px;right:70px;font-size:11px;color:var(--dim);font-family:var(--mono);opacity:0;transition:.15s}
+  .codewrap:hover .lang-tag{opacity:1}
+  .widgetbox{margin:24px 0;padding:20px;background:var(--panel);border:1px solid var(--border);border-radius:12px}
+  .widgetbox .wtitle{font-size:13px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+  .wrow{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+  .wrow label{font-size:13px;color:var(--muted)}
+  .wrow input,.wrow select{background:var(--panel-2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-family:var(--mono);font-size:14px}
+  .wtable{width:100%;border-collapse:collapse;font-size:13px;font-family:var(--mono)}
+  .wtable th,.wtable td{border:1px solid var(--border);padding:7px 10px;text-align:left}
+  .wtable th{background:var(--panel-2);color:var(--muted);font-family:var(--sans);font-size:12px}
+  .wbar{height:26px;border-radius:5px;display:flex;overflow:hidden;margin-top:6px;border:1px solid var(--border)}
+  .wbar > span{display:flex;align-items:center;justify-content:center;font-size:11px;color:#04140a;font-family:var(--sans);font-weight:600}
+  .pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:24px;border-top:1px solid var(--border)}
+  .pager button{flex:1;text-align:left;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 18px;color:var(--text);cursor:pointer;transition:.15s}
+  .pager button:hover:not(:disabled){border-color:var(--accent);background:var(--panel-2)}
+  .pager button:disabled{opacity:.35;cursor:default}
+  .pager .dir{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+  .pager .nm{font-size:14px;margin-top:3px}
+  .pager .next{text-align:right}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+  /* ---- tablet / phone ---- */
+  @media (max-width:900px){
+    .menu-btn{display:block}
+    .sidebar{position:fixed;top:56px;left:0;bottom:0;z-index:50;width:300px;max-width:82vw;
+             transform:translateX(-100%);transition:transform .22s ease;box-shadow:2px 0 16px rgba(0,0,0,.4)}
+    .sidebar.open{transform:none}
+    .content{padding:22px 20px 100px}
+    .lesson-head h1{font-size:24px}
+    .top-progress{min-width:0}
+    .top-progress span{min-width:0;font-size:12px}
+  }
+  @media (max-width:560px){
+    .brand small{display:none}
+    .top-progress .bar{display:none}
+    .content{padding:18px 14px 90px}
+    .lesson-head h1{font-size:21px}
+    .md pre{font-size:12px}
+    .pager{flex-direction:column}
+  }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button id="menu-btn" class="menu-btn" aria-label="Toggle menu">☰</button>
+    <div class="brand"><span class="dot"></span>DevOps + AWS Path <small>&nbsp;zero → expert</small></div>
+    <div class="top-progress">
+      <div class="bar"><i id="topbar-fill"></i></div>
+      <span id="top-progress-text">0 of 0 labs</span>
+    </div>
+  </div>
+  <div class="layout">
+    <nav class="sidebar" id="sidebar"></nav>
+    <div class="scrim" id="scrim"></div>
+    <main class="content" id="content"><div class="content-inner" id="content-inner"></div></main>
+  </div>
+
+<script src="content.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+const NAV = [
+  { title:'Getting started', items:[
+    { id:'overview', path:'README.md', name:'Overview', time:'5 min' },
+    { id:'roadmap', path:'ROADMAP.md', name:'The 24-week roadmap', time:'20 min' },
+    { id:'setup', path:'SETUP.md', name:'Toolchain setup', time:'60–90 min' },
+  ]},
+  { title:'Phase 0 · Foundations', items:[
+    { id:'p0', path:'labs/00-foundations/README.md', name:'Phase 0 overview', time:'5 min' },
+    { id:'p0l1', path:'labs/00-foundations/lab-01-linux-cli.md', name:'Lab 1 · Linux & CLI', time:'~8 h' },
+    { id:'p0l2', path:'labs/00-foundations/lab-02-git-and-scripting.md', name:'Lab 2 · Git & scripting', time:'~8 h' },
+    { id:'p0l3', path:'labs/00-foundations/lab-03-networking.md', name:'Lab 3 · Networking (CIDR)', time:'~8 h', widget:'cidr' },
+  ]},
+  { title:'Phase 1 · AWS Fundamentals', items:[
+    { id:'p1', path:'labs/01-aws-fundamentals/README.md', name:'Phase 1 overview', time:'5 min' },
+    { id:'p1l1', path:'labs/01-aws-fundamentals/lab-01-iam-cli-localstack.md', name:'Lab 1 · IAM, CLI & LocalStack', time:'~8 h' },
+    { id:'p1l2', path:'labs/01-aws-fundamentals/lab-02-ec2-vpc.md', name:'Lab 2 · EC2 & VPC', time:'~10 h', widget:'cidr' },
+    { id:'p1l3', path:'labs/01-aws-fundamentals/lab-03-s3-rds-lambda.md', name:'Lab 3 · S3, RDS & Lambda', time:'~12 h' },
+  ]},
+  { title:'Phases 2–7', items:[
+    { id:'soon', locked:true, name:'Containers, Terraform, CI/CD, EKS, observability (added when you reach Phase 1 gate)', time:'' },
+  ]},
+  { title:'Reference', items:[
+    { id:'glossary', path:'resources/aws-glossary.md', name:'AWS glossary', time:'ref' },
+    { id:'tools', path:'resources/free-tools.md', name:'Free tools', time:'ref' },
+    { id:'interview', path:'resources/interview-prep.md', name:'Interview prep', time:'ref' },
+    { id:'progress', path:'PROGRESS.md', name:'Progress checklist', time:'ref' },
+  ]},
+];
+const FLAT = NAV.flatMap(s=>s.items).filter(i=>!i.locked);
+const COMPLETABLE = FLAT.filter(i=>/l\d/.test(i.id));
+const LS_KEY='devops-aws-progress-v1';
+
+function loadProgress(){ try{return JSON.parse(localStorage.getItem(LS_KEY))||{}}catch(e){return {}} }
+function saveProgress(p){ localStorage.setItem(LS_KEY, JSON.stringify(p)); }
+let progress = loadProgress();
+
+function updateTopProgress(){
+  const total=COMPLETABLE.length, done=COMPLETABLE.filter(i=>progress[i.id]).length;
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('topbar-fill').style.width=pct+'%';
+  document.getElementById('top-progress-text').textContent=done+' of '+total+' labs · '+pct+'%';
+}
+
+marked.setOptions({ gfm:true, breaks:false });
+function renderMarkdown(md){
+  const tmp=document.createElement('div'); tmp.innerHTML=marked.parse(md);
+  tmp.querySelectorAll('pre code').forEach(code=>{
+    const pre=code.parentElement, wrap=document.createElement('div'); wrap.className='codewrap';
+    pre.parentNode.insertBefore(wrap,pre); wrap.appendChild(pre);
+    const cls=(code.className.match(/language-(\w+)/)||[])[1]||'';
+    try{ hljs.highlightElement(code); }catch(e){}
+    if(cls){ const tag=document.createElement('span'); tag.className='lang-tag'; tag.textContent=cls; wrap.appendChild(tag); }
+    const btn=document.createElement('button'); btn.className='copybtn'; btn.textContent='Copy';
+    btn.onclick=()=>{ navigator.clipboard.writeText(code.textContent); btn.textContent='Copied ✓'; btn.classList.add('copied'); setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied')},1400); };
+    wrap.appendChild(btn);
+  });
+  return tmp.innerHTML;
+}
+
+// CIDR subnet visualizer
+function buildCidrWidget(){
+  const box=document.createElement('div'); box.className='widgetbox';
+  box.innerHTML=`
+    <div class="wtitle">◆ interactive · CIDR subnet calculator</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px">Type a VPC CIDR and how many subnets you want. This is the exact math you'll do when carving up a VPC.</div>
+    <div class="wrow">
+      <label>VPC CIDR</label><input id="c-base" value="10.0.0.0/16" size="16">
+      <label>split into</label>
+      <select id="c-count"><option>2</option><option selected>4</option><option>6</option><option>8</option><option>16</option></select>
+      <span>subnets</span>
+    </div>
+    <div id="c-summary" style="font-size:13px;color:var(--text);margin-bottom:6px"></div>
+    <div class="wbar" id="c-bar"></div>
+    <div style="overflow-x:auto"><table class="wtable" id="c-table"></table></div>`;
+  function ipToInt(ip){return ip.split('.').reduce((a,o)=>(a<<8)+ (+o),0)>>>0;}
+  function intToIp(n){return [24,16,8,0].map(s=>(n>>>s)&255).join('.');}
+  function calc(){
+    const raw=box.querySelector('#c-base').value.trim();
+    const m=raw.match(/^(\d+\.\d+\.\d+\.\d+)\/(\d+)$/);
+    const sum=box.querySelector('#c-summary'), tbl=box.querySelector('#c-table'), bar=box.querySelector('#c-bar');
+    if(!m){ sum.textContent='Enter a valid CIDR like 10.0.0.0/16'; tbl.innerHTML=''; bar.innerHTML=''; return; }
+    const base=ipToInt(m[1]), prefix=+m[2], count=+box.querySelector('#c-count').value;
+    const bits=Math.ceil(Math.log2(count)), newPrefix=prefix+bits;
+    if(newPrefix>32){ sum.textContent='Too many subnets for this network size.'; tbl.innerHTML=''; bar.innerHTML=''; return; }
+    const size=2**(32-newPrefix), total=2**(32-prefix);
+    sum.innerHTML='VPC <b>'+raw+'</b> = '+total.toLocaleString()+' addresses → '+count+' × <b>/'+newPrefix+'</b> subnets of '+size.toLocaleString()+' addresses each';
+    let rows='<tr><th>#</th><th>role</th><th>CIDR</th><th>range</th><th>addresses</th></tr>';
+    const colors=['#ff9900','#4f8cff','#3fb950','#d29922','#c586ff','#ff7b72','#56d4dd','#f0883e'];
+    let barHtml='';
+    for(let i=0;i<count;i++){
+      const start=base+i*size, cidr=intToIp(start)+'/'+newPrefix;
+      const role = i<count/2 ? 'public '+String.fromCharCode(97+(i%(count/2))) : 'private '+String.fromCharCode(97+(i%(count/2)));
+      rows+='<tr><td>'+i+'</td><td>'+role+'</td><td>'+cidr+'</td><td>'+intToIp(start)+'–'+intToIp(start+size-1)+'</td><td>'+size.toLocaleString()+'</td></tr>';
+      barHtml+='<span style="background:'+colors[i%colors.length]+';flex:1">'+(size>=256?('/'+newPrefix):'')+'</span>';
+    }
+    tbl.innerHTML=rows; bar.innerHTML=barHtml;
+  }
+  box.querySelector('#c-base').oninput=calc;
+  box.querySelector('#c-count').onchange=calc;
+  calc();
+  return box;
+}
+
+let current=null;
+function openLesson(id){
+  const item=FLAT.find(i=>i.id===id); if(!item) return;
+  current=id;
+  const inner=document.getElementById('content-inner');
+  const md=window.CURRICULUM[item.path]||'*(content not bundled — run `node webapp/build-content.js`)*';
+  const secTitle=(NAV.find(s=>s.items.includes(item))||{}).title||'';
+  const done=!!progress[id], canComplete=/l\d/.test(item.id);
+  inner.innerHTML='';
+  const head=document.createElement('div'); head.className='lesson-head';
+  head.innerHTML='<div class="crumb">'+secTitle+'</div><h1>'+item.name+'</h1>'+
+    '<div class="badges"><span class="badge time">⧗ '+(item.time||'reference')+'</span>'+
+    (canComplete?'<button class="complete-btn '+(done?'done':'')+'" id="cbtn">'+(done?'✓ Completed':'Mark complete')+'</button>':'')+'</div>';
+  inner.appendChild(head);
+  const body=document.createElement('div'); body.className='md'; body.innerHTML=renderMarkdown(md); inner.appendChild(body);
+
+  if(item.widget==='cidr'){
+    const w=buildCidrWidget();
+    const target=[...body.querySelectorAll('h2,h3')].find(h=>/cidr|subnet|target architecture/i.test(h.textContent));
+    if(target) target.parentNode.insertBefore(w, target.nextSibling); else body.insertBefore(w, body.firstChild);
+  }
+
+  if(canComplete) document.getElementById('cbtn').onclick=()=>{ progress[id]=!progress[id]; saveProgress(progress); renderSidebar(); updateTopProgress(); openLesson(id); };
+
+  const idx=FLAT.indexOf(item), prev=FLAT[idx-1], next=FLAT[idx+1];
+  const pager=document.createElement('div'); pager.className='pager';
+  pager.innerHTML='<button '+(prev?'':'disabled')+' id="pgprev"><div class="dir">← Previous</div><div class="nm">'+(prev?prev.name:'—')+'</div></button>'+
+    '<button class="next" '+(next?'':'disabled')+' id="pgnext"><div class="dir">Next →</div><div class="nm">'+(next?next.name:'—')+'</div></button>';
+  inner.appendChild(pager);
+  if(prev) document.getElementById('pgprev').onclick=()=>openLesson(prev.id);
+  if(next) document.getElementById('pgnext').onclick=()=>openLesson(next.id);
+
+  renderSidebar();
+  document.getElementById('content').scrollTop=0;
+  location.hash=id;
+}
+
+function renderSidebar(){
+  const sb=document.getElementById('sidebar'); sb.innerHTML='';
+  NAV.forEach(sec=>{
+    const t=document.createElement('div'); t.className='sec-title'; t.textContent=sec.title; sb.appendChild(t);
+    sec.items.forEach(item=>{
+      const el=document.createElement('div');
+      el.className='navitem'+(item.locked?' locked':'')+(item.id===current?' active':'')+(progress[item.id]?' done':'');
+      el.innerHTML='<span class="tick">'+(progress[item.id]?'✓':'')+'</span><span class="label">'+item.name+'</span>'+(item.time?'<span class="time">'+item.time+'</span>':'');
+      if(!item.locked) el.onclick=()=>{ openLesson(item.id); if(window.innerWidth<=900) closeDrawer(); };
+      sb.appendChild(el);
+    });
+  });
+}
+
+// mobile drawer
+const sidebarEl=document.getElementById('sidebar'), scrimEl=document.getElementById('scrim');
+function closeDrawer(){ sidebarEl.classList.remove('open'); scrimEl.classList.remove('show'); }
+document.getElementById('menu-btn').onclick=()=>{ sidebarEl.classList.toggle('open'); scrimEl.classList.toggle('show'); };
+scrimEl.onclick=closeDrawer;
+
+renderSidebar(); updateTopProgress();
+const start=(location.hash||'').replace('#','');
+openLesson(FLAT.find(i=>i.id===start)?start:'overview');
+</script>
+</body>
+</html>

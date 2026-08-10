@@ -1,0 +1,21 @@
+{
+  "name": "DevOps + AWS Learning Environment",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/aws-cli:1": {},
+    "ghcr.io/devcontainers/features/terraform:1": {},
+    "ghcr.io/devcontainers/features/node:1": { "version": "lts" },
+    "ghcr.io/devcontainers/features/python:1": { "version": "3.12" },
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {}
+  },
+  "postCreateCommand": "pip install awscli-local --break-system-packages || pip install awscli-local; echo 'Ready. Start LocalStack: docker run -d -p 4566:4566 localstack/localstack'",
+  "forwardPorts": [8778, 4566],
+  "portsAttributes": {
+    "8778": { "label": "Learning app" },
+    "4566": { "label": "LocalStack" }
+  },
+  "customizations": {
+    "vscode": { "extensions": ["hashicorp.terraform", "amazonwebservices.aws-toolkit-vscode"] }
+  }
+}

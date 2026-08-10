@@ -1,0 +1,22 @@
+# local env / secrets — never commit
+*.pem
+*.key
+.env
+.env.*
+credentials
+.aws/
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# lab evidence is personal — keep it out of the shared repo
+labs/**/evidence/*
+!labs/**/evidence/.gitkeep
+
+# os / editor cruft
+.DS_Store
+Thumbs.db
+node_modules/
+__pycache__/
+*.pyc
