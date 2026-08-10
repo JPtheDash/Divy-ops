@@ -52,6 +52,13 @@
   .hint{font-size:13px;color:var(--accent);margin-top:6px;display:none}
   .opt{display:block;width:100%;text-align:left;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:8px 0;color:var(--text);cursor:pointer;font-size:14px;transition:.12s}
   .opt:hover{border-color:var(--accent)}.opt.correct{background:var(--ok-soft);border-color:var(--ok)}.opt.wrong{background:var(--danger-soft);border-color:var(--danger)}
+  .opt.sel{border-color:var(--accent);background:var(--soft)}
+  .dash{max-width:820px;margin:0 auto;padding:0 20px}
+  .dash-bar{height:10px;background:var(--panel-2);border-radius:99px;overflow:hidden;margin:10px 0 4px}
+  .dash-bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+  .dash-stats{display:flex;gap:18px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+  .dash-stats b{color:var(--text)}
+  .reset-btn{font-size:12px;color:var(--dim);background:none;border:none;cursor:pointer;text-decoration:underline}
   .explain{margin-top:12px;padding:12px 14px;border-radius:8px;background:var(--panel-2);border:1px solid var(--border);font-size:14px;display:none}
   .explain.show{display:block}
   .cp-input{width:100%;min-height:76px;background:#0a0e13;border:1px solid var(--border);border-radius:8px;color:#e6edf3;font-family:var(--mono);font-size:13px;padding:10px;resize:vertical}
@@ -93,6 +100,9 @@
 
 <script src="sim-shell.js"></script>
 <script src="sim-aws.js"></script>
+<script src="sim-docker.js"></script>
+<script src="sim-terraform.js"></script>
+<script src="sim-k8s.js"></script>
 <script src="lessons.js"></script>
 <script src="player.js"></script>
 <script>
@@ -108,14 +118,31 @@ const desc={
   'aws-iam-cli':'users, roles, least-privilege policies',
   'aws-s3':'buckets, objects, presigned URLs',
   'aws-vpc':'VPC, subnets, gateways, instances',
-  'aws-lambda':'functions and event-driven triggers'
+  'aws-lambda':'functions and event-driven triggers',
+  'docker-basics':'build, run, ps, stop images',
+  'docker-images':'small, non-root, tagged images',
+  'terraform-basics':'init, plan, apply, destroy',
+  'terraform-state':'remote state, locking, modules',
+  'cicd-pipeline':'build, test, deploy on push',
+  'kubernetes-basics':'deployments, pods, scaling, services',
+  'eks':'managed Kubernetes on AWS + IRSA',
+  'observability':'metrics, logs, traces, SLOs, incidents',
+  'capstone-review':'tie it all together + final exam'
 };
-const icons={'linux-permissions':'$_','linux-cli':'>_','git-basics':'⎇','networking-cidr':'</>','aws-iam-cli':'IAM','aws-s3':'S3','aws-vpc':'VPC','aws-lambda':'ƛ'};
+const icons={'linux-permissions':'$_','linux-cli':'>_','git-basics':'⎇','networking-cidr':'</>','aws-iam-cli':'IAM','aws-s3':'S3','aws-vpc':'VPC','aws-lambda':'ƛ','docker-basics':'🐳','docker-images':'📦','terraform-basics':'TF','terraform-state':'TF','cicd-pipeline':'CI','kubernetes-basics':'K8s','eks':'EKS','observability':'📊','capstone-review':'★'};
 
 function renderMenu(){
   const c=completed();
+  const allIds=LESSON_ORDER.flatMap(g=>g.ids);
+  const doneCount=allIds.filter(id=>c[id]).length;
+  const pct=Math.round(doneCount/allIds.length*100);
   let html=`<div class="menu-head"><h1><span class="dot"></span>Interactive lessons</h1>
     <p style="color:var(--muted)">Learn by doing — real commands in a mock environment. <a class="live-btn" href="index.html" style="display:inline-block;margin-left:6px">← reading course</a></p></div>
+    <div class="dash">
+      <div class="dash-bar"><i style="width:${pct}%"></i></div>
+      <div class="dash-stats"><span><b>${doneCount}</b> / ${allIds.length} lessons complete</span><span><b>${pct}%</b></span>
+      ${doneCount?'<button class="reset-btn" id="resetp">reset progress</button>':''}</div>
+    </div>
     <div class="menu-grid">`;
   LESSON_ORDER.forEach(group=>{
     html+=`<div class="phase-title">${group.phase}</div>`;
@@ -124,14 +151,14 @@ function renderMenu(){
       html+=`<a class="lesson-card ${c[id]?'done-card':''}" href="#${id}">
         <div class="ic">${c[id]?'✓':(icons[id]||'•')}</div>
         <div><div class="t">${L.name}</div><div class="d">${desc[id]||''}</div></div>
-        <div class="chev">›</div></a>`;
+        <div class="chev">${c[id]?'done':'›'}</div></a>`;
     });
   });
   html+=`</div>`;
-  document.getElementById('app').innerHTML=html;
-  document.getElementById('app').style.display='block';
-  document.getElementById('app').style.height='auto';
-  document.getElementById('app').style.overflow='visible';
+  const app=document.getElementById('app');
+  app.innerHTML=html; app.style.display='block'; app.style.height='auto'; app.style.overflow='visible';
+  const rb=document.getElementById('resetp');
+  if(rb) rb.onclick=()=>{ if(confirm('Reset all lesson progress?')){ localStorage.removeItem(LS); renderMenu(); } };
 }
 
 function route(){
@@ -139,10 +166,7 @@ function route(){
   const app=document.getElementById('app');
   app.style.display='flex'; app.style.height='100vh'; app.style.overflow='hidden';
   if(id && LESSONS[id]){
-    startLesson(LESSONS[id]);
-    // mark complete when the user reaches the finish screen
-    const obs=new MutationObserver(()=>{ if(document.querySelector('.done-screen')){ markComplete(id); obs.disconnect(); } });
-    obs.observe(app,{childList:true,subtree:true});
+    startLesson(LESSONS[id], ()=>markComplete(id));
   } else {
     renderMenu();
   }
