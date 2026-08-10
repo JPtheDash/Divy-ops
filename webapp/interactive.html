@@ -164,10 +164,14 @@ function renderMenu(){
 function route(){
   const id=(location.hash||'').replace('#','');
   const app=document.getElementById('app');
-  app.style.display='flex'; app.style.height='100vh'; app.style.overflow='hidden';
   if(id && LESSONS[id]){
+    // lesson player: fixed full-height shell (its own inner scroll area)
+    document.body.style.overflow='hidden'; document.body.style.height='100vh';
+    app.style.display='flex'; app.style.height='100vh'; app.style.overflow='hidden';
     startLesson(LESSONS[id], ()=>markComplete(id));
   } else {
+    // menu: normal page scroll
+    document.body.style.overflow='auto'; document.body.style.height='auto';
     renderMenu();
   }
 }
