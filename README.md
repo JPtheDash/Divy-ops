@@ -1,30 +1,33 @@
 # DevOps + AWS: Zero to Expert
 
-A 24-week, hands-on curriculum built for a **test engineer** moving into DevOps
-on AWS. Every lab is designed to run for **free** — inside the AWS Free Tier or
+A 24-week, hands-on curriculum that takes you from zero to job-ready in DevOps on
+AWS. Every lab is designed to run for **free** — inside the AWS Free Tier or
 emulated locally with LocalStack — with teardown steps so you never get a surprise bill.
 
 **Target pace:** 10–15 hrs/week → ~6 months to genuine job-ready competence.
 
+**Who it's for:** anyone comfortable with basic programming and the command line
+who wants to become a DevOps / cloud / platform engineer. No prior cloud or
+infrastructure experience assumed.
+
 ---
 
-## Why your QA background is an advantage
+## What DevOps actually is
 
-DevOps is, at its core, **automation + reliability thinking** — and you already
-own half of that from testing.
+At its core, DevOps is **automation + reliability thinking**: describing systems as
+code so they're repeatable, shipping changes safely through pipelines, and running
+them so they stay up. This path builds that skill set in the order it compounds —
+foundations first, then cloud, then how to automate and operate it all.
 
-| What you do today | What it becomes in DevOps |
-|---|---|
-| Writing repeatable test cases | Writing repeatable infrastructure (IaC) |
-| CI test runs | CI/CD pipelines that build, test, and deploy |
-| Reproducible test environments | Immutable, reproducible infra with Terraform |
-| Flaky test triage | Debugging flaky deployments and infra drift |
-| Test coverage & quality gates | Deployment gates, health checks, rollbacks |
-| Logging bugs with repro steps | Observability: metrics, logs, traces, alerts |
-| "Does it work under load?" | Scaling, load balancing, capacity planning |
+The five things you'll be able to do by the end:
 
-The gap you're closing is **cloud infrastructure + operating systems at scale**,
-not the discipline of doing things repeatably. You already think that way.
+1. **Provision infrastructure as code** — define servers, networks, and databases in
+   Terraform so an entire environment can be created or destroyed with one command.
+2. **Containerize and ship applications** — package apps with Docker and run them on AWS.
+3. **Build CI/CD pipelines** — every code push builds, tests, and deploys automatically.
+4. **Operate at scale** — load balancing, autoscaling, and self-healing on Kubernetes.
+5. **Observe and respond** — dashboards, alerts, and incident runbooks so you know
+   when something breaks and why.
 
 ---
 

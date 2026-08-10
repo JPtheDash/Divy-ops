@@ -1,7 +1,8 @@
 # DevOps + AWS Roadmap — 24 Weeks, 8 Phases
 
-**Assumed start:** test engineer. Comfortable with software and CI concepts,
-limited depth in Linux internals, cloud, and infrastructure.
+**Assumed start:** comfortable with basic programming and the command line, and
+familiar with the idea of CI. Limited depth in Linux internals, cloud, and
+infrastructure — that's what this builds. No prior cloud experience assumed.
 
 **Assumed pace:** 12 hrs/week, ~40% reading/watching, 60% hands-on. When short
 on time, cut the reading, never the labs.
@@ -140,7 +141,7 @@ run it with health checks and graceful shutdown.
 
 # PHASE 3 — Infrastructure as Code (Weeks 11–14)
 
-The heart of modern DevOps and where your "repeatable" instinct pays off most.
+The heart of modern DevOps — describing infrastructure so it's repeatable and reviewable.
 
 ### Week 11 — Terraform fundamentals
 - HCL, providers, resources, data sources
@@ -243,7 +244,7 @@ health probes; do most of it on free local `kind`, then a brief real EKS run.
 - SLIs, SLOs, error budgets
 - Alerting that doesn't cause fatigue; on-call basics
 - Incident response: detect, mitigate, resolve, postmortem
-- Blameless postmortems (reuse your bug-writeup skills)
+- Blameless postmortems: documenting what happened and why, without blame
 - Autoscaling, self-healing, and chaos-testing basics
 - Cost monitoring as an ops discipline
 
